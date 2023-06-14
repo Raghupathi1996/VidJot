@@ -1,6 +1,8 @@
+require('dotenv').config()
 const express = require('express')
 const exphbs = require('express-handlebars')
-
+const mongoose = require('mongoose')
+const connectDB = require('./db/connect')
 
 const app = express()
 // console.log(exphbs) // contains ExpressHandlebars, create, and engine
@@ -32,7 +34,16 @@ app.get('/about', (req,res) => {
     res.render('about')
 })
 
-const port = 5000
-app.listen(port, () => {
-    console.log(`Server started on port ${port}`)  //use of back tick or templete literal, to use string without have to concatinate
-})
+const port = process.env.POR || 5000
+
+const start = async () => {
+    try {
+        await connectDB()
+        app.listen(port, () => {
+            console.log(`Server started on port ${port}`)  //use of back tick or templete literal, to use string without have to concatinate
+        })
+    } catch (error) {
+        console.log(error)
+    }
+
+}
