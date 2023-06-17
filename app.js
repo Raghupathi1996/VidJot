@@ -7,6 +7,10 @@ const connectDB = require('./db/connect')
 const app = express()
 // console.log(exphbs) // contains ExpressHandlebars, create, and engine
 
+//Load Idea model
+require('./models/Idea')
+const Idea = mongoose.model('Ideas')
+
 // Handlebars Middleware
 app.engine('handlebars', exphbs.engine({
     defaultLayout: 'main'
@@ -34,11 +38,15 @@ app.get('/about', (req,res) => {
     res.render('about')
 })
 
+app.get('/idea/add', (req,res) => {
+     
+})
+
 const port = process.env.POR || 5000
 
 const start = async () => {
     try {
-        await connectDB()
+        await connectDB(process.env.MONGO_URI)
         app.listen(port, () => {
             console.log(`Server started on port ${port}`)  //use of back tick or templete literal, to use string without have to concatinate
         })
@@ -47,3 +55,5 @@ const start = async () => {
     }
 
 }
+
+start()
