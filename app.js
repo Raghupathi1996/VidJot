@@ -1,11 +1,19 @@
 require('dotenv').config()
 const express = require('express')
 const exphbs = require('express-handlebars')
+const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const connectDB = require('./db/connect')
 
 const app = express()
 // console.log(exphbs) // contains ExpressHandlebars, create, and engine
+
+// // Json parser
+// app.use(express.json())
+
+// Body parser Middleware
+app.use(bodyParser.urlencoded({ extended: false}))
+app.use(bodyParser.json())
 
 //Load Idea model
 require('./models/Idea')
@@ -38,10 +46,32 @@ app.get('/about', (req,res) => {
     res.render('about')
 })
 
-app.get('/idea/add', (req,res) => {
-     
+// Add Idea Form
+app.get('/ideas/add', (req,res) => {
+     res.render('ideas/add')
 })
 
+// Process Form
+app.post('/ideas',(req, res) => {
+    let errors = [];
+
+    if(!req.body.title){
+        errors.push({text: 'Please add a title'})
+    }
+    if(!req.body.details){
+        errors.push({text:'Please add some details'})
+    }
+
+    if(errors.length > 0){
+        res.render('ideas/add', {
+            errors: errors,
+            title: req.body.title,
+            details: req.body.details
+        })
+    } else {
+        new Idea(req.body )
+    }
+})
 const port = process.env.POR || 5000
 
 const start = async () => {
