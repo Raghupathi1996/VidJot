@@ -1,6 +1,6 @@
 const index =  async (req,res) => {
     const title = 'Welcome'
-    res.send("HI")
+    res.send(title)
 }
 
 module.exports = index
