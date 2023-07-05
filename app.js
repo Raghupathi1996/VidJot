@@ -1,14 +1,22 @@
 require('dotenv').config()
 const express = require('express')
-const exphbs = require('express-handlebars')
-const methodOverride = require('method-override')
-const bodyParser = require('body-parser')
+const path = require('path')
+const exphbs = require('express-handlebars')  // server side rendering 
+const methodOverride = require('method-override')  // HTML does not support put and delete 
+const bodyParser = require('body-parser')  // parse the object from the mongoDB or from front end
+const flash = require('connect-flash')
+const session = require('express-session')
 const mongoose = require('mongoose')
 const connectDB = require('./db/connect')
 const notFound = require('./middleware/not-found')
 const mainRoute = require('./routes/vidjot')
 
 const app = express()
+
+// Load routes
+const ideas = require('./routes/ideas')
+const users = require('./routes/users')
+
 
 // console.log(exphbs) // contains ExpressHandlebars, create, and engine
 
@@ -17,14 +25,30 @@ const app = express()
 
 // Body parser Middleware
 app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+app.use(bodyParser.json()) 
+
+// Static folder
+app.use(express.static(path.join(__dirname, 'public')))
 
 // Method override middleware
 app.use(methodOverride('_method'))
 
-//Load Idea model
-require('./models/Idea')
-const Idea = mongoose.model('Ideas')
+// Express session middleware
+app.use(session({
+    secret: 'secret', // the key used to read and write in to cookies 
+    resave: true, // forces the session to be stored back to the session store
+    saveUninitialized: true // forces the session that is unintialized to be saved in the storage
+}))
+
+app.use(flash())
+
+app.use(function(req, res, next){
+    res.locals.success_msg = req.flash('success_msg')
+    res.locals.error_msg = req.flash('error_msg')
+    res.locals.error = req.flash('error')
+    next();
+})
+
 
 // Handlebars Middleware
 app.engine('handlebars', exphbs.engine({
@@ -54,89 +78,10 @@ app.get('/about', (req, res) => {
     res.render('about')
 })
 
-app.get('/ideas', async (req, res) => {
-    await Idea.find({})
-    .lean()
-    .sort({date:'desc'})
-    .then(ideas => {
-        // console.log(ideas)
-        res.render('ideas/index', {
-            ideas:ideas
-        })
-    }) 
-    // with .lean() it returns a plain javascript object
-    // you lose some of the benefits provided by Mongoose, such as schema validation and middleware hooks
-    
-    
-    // await Idea.find({})
-    // .sort({date:'desc'})
-    // .then(ideas => {
-    //     console.log(ideas)
-    // })
-})
+app.use('/ideas', ideas)
+app.use('/users', users)
 
-// Add Idea Form
-app.get('/ideas/add', (req, res) => {
-    res.render('ideas/add')
-})
 
-app.get('/ideas/edit/:id', (req, res) => {
-    Idea.findOne({
-        _id: req.params.id
-    })
-    .lean()
-    .then(idea => {
-        res.render('ideas/edit', {
-            idea:idea
-        })
-    })
-})
-
-// Process Form
-app.post('/ideas', (req, res) => {
-    let errors = [];
-    
-    if (!req.body.title) {
-        errors.push({ text: 'Please add a title' })
-    }
-    if (!req.body.details) {
-        errors.push({ text: 'Please add some details' })
-    }
-    
-    if (errors.length > 0) {
-        res.render('ideas/add', {
-            errors: errors,
-            title: req.body.title,
-            details: req.body.details
-        })
-    } else {
-        const newUser = {
-            title: req.body.title,
-            details: req.body.details
-        }
-        new Idea(newUser)
-          .save()
-          .then(idea => {
-            res.redirect('/ideas')
-          })
-    }
-})
-
-// Edit form process
-app.put('/ideas/:id', (req, res) => {
-    Idea.findOne({
-        _id: req.params.id
-    })
-    .then(idea => {
-        idea.title = req.body.title
-        idea.details = req.body.details
-
-        idea.save()
-            .then(() => {
-                res.redirect('/ideas')
-            })
-    })
-})
 app.use(notFound)
 
 const port = process.env.POR || 5000
