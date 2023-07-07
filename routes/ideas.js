@@ -69,7 +69,7 @@ router.post('/', (req, res) => {
         }
         new Idea(newUser)
           .save()
-          .then(idea => {
+          .then(() => {
             req.flash('success_msg', 'Video idea added')
             res.redirect('/ideas')
           })
