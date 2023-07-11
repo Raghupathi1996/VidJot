@@ -1,5 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const bcrypt = require('bcryptjs')
+const passport = require('passport')
 const router = express.Router()
 
 //Load Idea model
@@ -7,8 +9,12 @@ require('../models/User')
 const User = mongoose.model('Users')
 
 // User Login Route
-router.get('/login', (req, res) => {
-    res.render('users/login')
+router.get('/login', (req, res, next) => {
+    passport.authenticate('local', {
+        successRedirect: '/ideas',
+        failureRedirect: '/users/login',
+        failureFlash: true
+    })
 })
 
 // User Registration Route
@@ -27,7 +33,7 @@ router.post('/register', (req, res) => {
 
     if(req.body.password.length < 4){
         errors.push({
-            error:'Password must be atleast 4 characters'
+            text:'Password must be atleast 4 characters'
         })
     }
 
@@ -40,18 +46,31 @@ router.post('/register', (req, res) => {
             password2: req.body.password2
         })
     } else {
-        const newRegister = {
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password
-        }
-        new User(newRegister)
-        .save()
-        .then(() => {
-            req.flash('success_msg', 'User Registered')
-            res.redirect('/users/login')
+        User.findOne({email: req.body.email})
+        .then(user => {
+            if(user){
+                req.flash('error_msg', 'Email already registred')
+                res.redirect('/users/register')
+            } else {
+                const newRegister = {
+                    name: req.body.name,
+                    email: req.body.email,
+                    password: req.body.password
+                }
+                bcrypt.genSalt(10, (err, salt) => {
+                    bcrypt.hash(newRegister.password, salt, (err, hash) => {
+                        if(err) throw err;
+                        newRegister.password = hash
+                        new User(newRegister)
+                        .save()
+                        .then(() => {
+                            req.flash('success_msg', 'User Registered')
+                            res.redirect('/users/login')
+                        })
+                    })
+                });
+            }
         })
-
     }
 })
 

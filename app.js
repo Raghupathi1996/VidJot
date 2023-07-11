@@ -4,8 +4,9 @@ const path = require('path')
 const exphbs = require('express-handlebars')  // server side rendering 
 const methodOverride = require('method-override')  // HTML does not support put and delete 
 const bodyParser = require('body-parser')  // parse the object from the mongoDB or from front end
-const flash = require('connect-flash')
-const session = require('express-session')
+const flash = require('connect-flash') // pass flash messages
+const session = require('express-session') // to track the sessions of the window
+const passport = require('passport')
 const mongoose = require('mongoose')
 const connectDB = require('./db/connect')
 const notFound = require('./middleware/not-found')
@@ -17,6 +18,8 @@ const app = express()
 const ideas = require('./routes/ideas')
 const users = require('./routes/users')
 
+// Passport Config
+require('./config/passport')(passport)
 
 // console.log(exphbs) // contains ExpressHandlebars, create, and engine
 
