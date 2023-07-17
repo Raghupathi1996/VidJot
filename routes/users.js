@@ -10,6 +10,7 @@ const User = mongoose.model('Users')
 
 // User Login Route
 router.get('/login', (req, res, next) => {
+    res.render('users/login')
     passport.authenticate('local', {
         successRedirect: '/ideas',
         failureRedirect: '/users/login',
