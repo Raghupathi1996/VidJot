@@ -17,7 +17,7 @@ module.exports = function(passport){
             // Match Password
             bcrypt.compare(password, user.password, (err, isMatch) => {
                 if(err) throw err;
-                if(!isMatch){
+                if(isMatch){
                     return done(null, user)
                 } else {
                     return done(null, false, {message: 'Password Incorrect'})
@@ -30,7 +30,8 @@ module.exports = function(passport){
         done(null, user.id)
     })
     passport.deserializeUser(function(id, done) {
-        User.findById(id, function(err, user) {
+        User.findById(id)
+        .then((err, user) => {
             done(err, user)
         })
     })

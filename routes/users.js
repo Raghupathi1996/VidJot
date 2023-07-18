@@ -11,16 +11,19 @@ const User = mongoose.model('Users')
 // User Login Route
 router.get('/login', (req, res, next) => {
     res.render('users/login')
-    passport.authenticate('local', {
-        successRedirect: '/ideas',
-        failureRedirect: '/users/login',
-        failureFlash: true
-    })
 })
 
 // User Registration Route
 router.get('/register', (req, res) => {
     res.render('users/register')
+})
+
+router.post('/login', (req, res, next) => {
+    passport.authenticate('local', {
+        successRedirect: '/ideas',
+        failureRedirect: '/users/login',
+        failureFlash: true
+    })(req, res, next)
 })
 
 router.post('/register', (req, res) => {
