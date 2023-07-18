@@ -16,12 +16,11 @@
                         <a class="nav-link" href="/about">About</a>
                     </li>
                 </ul>
-                <ul class="navbar-nav m1-auto">
+                <ul class="navbar-nav m1-auto mb-3 mb-lg-0">
                     {{#if user}}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                        id="navbarDropdownMenuLink"
-                            aria-expanded="false">
+                            id="navbarDropdownMenuLink" aria-expanded="false">
                             Video Ideas
                         </a>
                         <ul class="dropdown-menu">
@@ -46,8 +45,14 @@
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
+                <ul class="navbar-nav m1-auto mb-3 mb-lg-0">
+                    {{#if user}}
+                    <li class="nav-item">
+                        <a href="/users/logout" class="nav-link">Logout</a>
+                    </li>
+                    {{/if}}
+                </ul>
             </div>
         </div>
-        {{!--
-    </div> --}}
+    {{!-- </div> --}}
 </nav>

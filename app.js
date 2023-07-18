@@ -38,9 +38,9 @@ app.use(methodOverride('_method'))
 
 // Express session middleware
 app.use(session({
-    secret: 'secret', // the key used to read and write in to cookies 
-    resave: true, // forces the session to be stored back to the session store
-    saveUninitialized: true // forces the session that is unintialized to be saved in the storage
+    secret: 'secret', // This option specifies the secret used to sign the session cookie. It should be a random string that is unique to your application
+    resave: true, // This option indicates whether the session should be saved even if no modifications have been made to it.
+    saveUninitialized: true // This option determines whether a session should be saved if it is uninitialized
 }))
 
 // Passport Middleware
