@@ -21,6 +21,9 @@ const users = require('./routes/users')
 // Passport Config
 require('./config/passport')(passport)
 
+//DB Config
+const db = require('./config/database')
+
 // console.log(exphbs) // contains ExpressHandlebars, create, and engine
 
 // // Json parser
@@ -92,11 +95,11 @@ app.use('/users', users)
 
 app.use(notFound)
 
-const port = process.env.POR || 5000
+const port = process.env.PORT || 5000
 
 const start = async () => {
     try {
-        await connectDB(process.env.MONGO_URI)
+        await connectDB(db.mongoURI)
         app.listen(port, () => {
             console.log(`Server started on port ${port}`)  //use of back tick or templete literal, to use string without have to concatinate
         })
